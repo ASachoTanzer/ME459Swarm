@@ -1,5 +1,6 @@
 import random
 import math
+from swarm_sim import config
 
 def clamp(vec, max_len):
     x, y = vec
@@ -18,12 +19,16 @@ def random_walk(agent, sim):
     return clamp((vx, vy), sim.max_speed)
 
 def seek_target(agent, sim):
-    tx, ty = sim.target_pos
+    # prefer mothership-provided estimate if available
+    if getattr(agent, 'estimated_target', None) is not None:
+        tx, ty = agent.estimated_target
+    else:
+        tx, ty = sim.target_pos
     ax, ay = agent.pos
     dx = tx - ax
     dy = ty - ay
     dist = math.hypot(dx, dy)
-    if dist >= 30:
+    if dist >= agent.detection_radius:
         ax = (random.random() - 0.5) * 0.6
         ay = (random.random() - 0.5) * 0.6
         vx, vy = agent.velocity

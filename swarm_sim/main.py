@@ -51,7 +51,20 @@ class Simulation:
             r = min(self.window_size)//3
             self.target_pos = (cx + math.cos(t*0.6)*r*0.5, cy + math.sin(t*0.9)*r*0.6)
 
-            # step agents
+            # detection phase: agents detect target (if within range) and report to mothership
+            for a in self.agents:
+                try:
+                    a.detect_and_report(self)
+                except Exception:
+                    pass
+
+            # mothership integrates reports and broadcasts estimated target
+            try:
+                self.mothership.integrate_detections(self)
+            except Exception:
+                pass
+
+            # step agents (they may use mothership-provided estimate)
             for a in self.agents:
                 a.step(self)
 
@@ -66,7 +79,7 @@ class Simulation:
             # mothership
             pygame.draw.circle(self.screen, config.MOTHERSHIP_COLOR, (int(self.mothership.pos[0]), int(self.mothership.pos[1])), 10)
             # target
-            pygame.draw.circle(self.screen, pygame.Color(255, 255, 255, a=0), (int(self.target_pos[0]), int(self.target_pos[1])), 30)
+            pygame.draw.circle(self.screen, pygame.Color(255, 255, 255, a=0), (int(self.target_pos[0]), int(self.target_pos[1])), config.DETECTION_RADIUS)
             pygame.draw.circle(self.screen, config.TARGET_COLOR, (int(self.target_pos[0]), int(self.target_pos[1])), 8)
             # agents
             for a in self.agents:

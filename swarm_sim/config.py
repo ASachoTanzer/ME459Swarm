@@ -8,3 +8,6 @@ NUM_AGENTS = 25
 MAX_SPEED = 2.5
 AGENT_RADIUS = 6
 MOTHERSHIP_POS = (50, 50)
+DETECTION_RADIUS = 30
+# If True, measurement noise will be applied to agent detection readings (not implemented yet)
+MEASUREMENT_NOISE = False
