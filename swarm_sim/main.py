@@ -66,10 +66,13 @@ class Simulation:
             # mothership
             pygame.draw.circle(self.screen, config.MOTHERSHIP_COLOR, (int(self.mothership.pos[0]), int(self.mothership.pos[1])), 10)
             # target
+            pygame.draw.circle(self.screen, pygame.Color(255, 255, 255, a=0), (int(self.target_pos[0]), int(self.target_pos[1])), 30)
             pygame.draw.circle(self.screen, config.TARGET_COLOR, (int(self.target_pos[0]), int(self.target_pos[1])), 8)
             # agents
             for a in self.agents:
                 pygame.draw.circle(self.screen, config.AGENT_COLOR, (int(a.pos[0]), int(a.pos[1])), config.AGENT_RADIUS)
+                #pygame.draw.line(self.screen,[255,255,255],a.pos,self.mothership.pos)
+               
 
             # overlay text
             self._draw_info()
@@ -88,5 +91,5 @@ class Simulation:
 
 if __name__ == '__main__':
     sim = Simulation()
-    sim.setup(num_agents=25)
+    sim.setup(num_agents=250)
     sim.run()

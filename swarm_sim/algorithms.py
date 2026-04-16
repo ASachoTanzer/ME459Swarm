@@ -23,11 +23,17 @@ def seek_target(agent, sim):
     dx = tx - ax
     dy = ty - ay
     dist = math.hypot(dx, dy)
-    if dist == 0:
-        return agent.velocity
+    if dist >= 30:
+        ax = (random.random() - 0.5) * 0.6
+        ay = (random.random() - 0.5) * 0.6
+        vx, vy = agent.velocity
+        vx += ax
+        vy += ay
+        return clamp((vx, vy), sim.max_speed)
     desired = (dx / dist * sim.max_speed, dy / dist * sim.max_speed)
     vx, vy = agent.velocity
-    # steering = desired - velocity (simple)
+
+    #steering = desired - velocity (simple)
     steer = (desired[0] - vx, desired[1] - vy)
     return clamp((vx + steer[0]*0.05, vy + steer[1]*0.05), sim.max_speed)
 
