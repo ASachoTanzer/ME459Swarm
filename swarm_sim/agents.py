@@ -1,12 +1,17 @@
 import math
 from swarm_sim import algorithms
 from swarm_sim import config
+from swarm_sim import config
 
 class Agent:
     def __init__(self, pos, vel):
         self.pos = list(pos)
         self.velocity = list(vel)
         self.radius = 6
+        # detection settings
+        self.detection_radius = config.DETECTION_RADIUS
+        self.measurement_noise = config.MEASUREMENT_NOISE
+        self.estimated_target = None
         # detection settings
         self.detection_radius = config.DETECTION_RADIUS
         self.measurement_noise = config.MEASUREMENT_NOISE
