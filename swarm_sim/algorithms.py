@@ -144,7 +144,6 @@ def seek_target(agent, sim):
     dy = ty - ay
     dist = math.hypot(dx, dy)
     if dist >= agent.detection_radius:
-    if dist >= agent.detection_radius:
         ax = (random.random() - 0.5) * 0.6
         ay = (random.random() - 0.5) * 0.6
         vx, vy = agent.velocity
