@@ -3,10 +3,9 @@ from swarm_sim import algorithms
 from swarm_sim import config
 
 class Agent:
-    def __init__(self, pos, algorithm='random_walk'):
+    def __init__(self, pos, vel):
         self.pos = list(pos)
-        self.velocity = (0.0, 0.0)
-        self.algorithm = algorithm
+        self.velocity = list(vel)
         self.radius = 6
         # detection settings
         self.detection_radius = config.DETECTION_RADIUS
@@ -15,9 +14,9 @@ class Agent:
 
     def step(self, sim):
         # algorithm dispatcher
-        fn = getattr(algorithms, self.algorithm, algorithms.random_walk)
-        new_vel = fn(self, sim)
-        # apply velocity
+        # fn = getattr(algorithms, self.algorithm, algorithms.random_walk)
+        new_vel = algorithms.dynamic_k_pso(self, sim)
+        # apply velocity and clamp
         self.velocity = new_vel
         self.pos[0] += self.velocity[0]
         self.pos[1] += self.velocity[1]
@@ -44,12 +43,3 @@ class Agent:
     def receive_estimated_target(self, estimated_pos, sim=None):
         # mothership-provided estimated target location
         self.estimated_target = estimated_pos
-
-    def receive_signal(self, signal, sim):
-        # Example: switch algorithm based on mothership signal
-        if signal == 'go_seek':
-            self.algorithm = 'seek_target'
-        elif signal == 'go_flock':
-            self.algorithm = 'flock'
-        elif signal == 'scatter':
-            self.algorithm = 'random_walk'

@@ -13,10 +13,13 @@ class Simulation:
         pygame.display.set_caption('Swarm Sim — moving target + mothership')
         self.clock = pygame.time.Clock()
         self.agents = []
-        self.mothership = Mothership(config.MOTHERSHIP_POS)
+        if config.USE_MOTHERSHIP:
+            self.mothership = Mothership(config.MOTHERSHIP_POS)
         self.global_signals = []
         self.target_pos = (self.window_size[0]//2, self.window_size[1]//2)
         self.max_speed = config.MAX_SPEED
+        # adaptive repulsion coefficient (updated by algorithms)
+        self.aR = config.AR_INIT
 
     def setup(self, num_agents=20):
         w, h = self.window_size
@@ -24,10 +27,12 @@ class Simulation:
             x = random.uniform(80, w-80)
             y = random.uniform(80, h-80)
             # start with mixed algorithms
-            alg = random.choice(['random_walk', 'flock', 'seek_target'])
-            a = Agent((x, y), algorithm=alg)
+            vx = random.uniform(-self.max_speed, self.max_speed)
+            vy = random.uniform(-self.max_speed, self.max_speed)
+            a = Agent((x, y), (vx, vy))
             self.agents.append(a)
-            self.mothership.subscribe(a)
+            if config.USE_MOTHERSHIP:
+                self.mothership.subscribe(a)
 
     def run(self):
         running = True
@@ -39,12 +44,13 @@ class Simulation:
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_1:
-                        self.mothership.broadcast('go_seek', self)
-                    elif event.key == pygame.K_2:
-                        self.mothership.broadcast('go_flock', self)
-                    elif event.key == pygame.K_3:
-                        self.mothership.broadcast('scatter', self)
+                    pass
+                    # if event.key == pygame.K_1:
+                    #     self.mothership.broadcast('go_seek', self)
+                    # elif event.key == pygame.K_2:
+                    #     self.mothership.broadcast('go_flock', self)
+                    # elif event.key == pygame.K_3:
+                    #     self.mothership.broadcast('scatter', self)
 
             # update moving target (circular path)
             cx, cy = self.window_size[0]//2, self.window_size[1]//2
@@ -52,32 +58,34 @@ class Simulation:
             self.target_pos = (cx + math.cos(t*0.6)*r*0.5, cy + math.sin(t*0.9)*r*0.6)
 
             # detection phase: agents detect target (if within range) and report to mothership
-            for a in self.agents:
+            if config.USE_MOTHERSHIP:
+                for a in self.agents:
+                    try:
+                        a.detect_and_report(self)
+                    except Exception:
+                        pass
+
+                # mothership integrates reports and broadcasts estimated target
                 try:
-                    a.detect_and_report(self)
+                    self.mothership.integrate_detections(self)
                 except Exception:
                     pass
-
-            # mothership integrates reports and broadcasts estimated target
-            try:
-                self.mothership.integrate_detections(self)
-            except Exception:
-                pass
 
             # step agents (they may use mothership-provided estimate)
             for a in self.agents:
                 a.step(self)
 
             # optionally process queued global signals
-            while self.global_signals:
-                sig = self.global_signals.pop(0)
-                # direct broadcast handled already in mothership
-                pass
+            # while self.global_signals:
+            #     sig = self.global_signals.pop(0)
+            #     # direct broadcast handled already in mothership
+            #     pass
 
             # draw
             self.screen.fill(config.BG_COLOR)
-            # mothership
-            pygame.draw.circle(self.screen, config.MOTHERSHIP_COLOR, (int(self.mothership.pos[0]), int(self.mothership.pos[1])), 10)
+            if config.USE_MOTHERSHIP:
+                # mothership
+                pygame.draw.circle(self.screen, config.MOTHERSHIP_COLOR, (int(self.mothership.pos[0]), int(self.mothership.pos[1])), 10)
             # target
             pygame.draw.circle(self.screen, pygame.Color(255, 255, 255, a=0), (int(self.target_pos[0]), int(self.target_pos[1])), config.DETECTION_RADIUS)
             pygame.draw.circle(self.screen, config.TARGET_COLOR, (int(self.target_pos[0]), int(self.target_pos[1])), 8)
@@ -104,5 +112,5 @@ class Simulation:
 
 if __name__ == '__main__':
     sim = Simulation()
-    sim.setup(num_agents=250)
+    sim.setup(num_agents=config.NUM_AGENTS)
     sim.run()

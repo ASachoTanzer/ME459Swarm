@@ -11,3 +11,21 @@ MOTHERSHIP_POS = (50, 50)
 DETECTION_RADIUS = 30
 # If True, measurement noise will be applied to agent detection readings (not implemented yet)
 MEASUREMENT_NOISE = False
+
+# Algorithm parameters (Adaptive Repulsion + Dynamic k-Nearest PSO)
+# Adaptive Repulsion
+AR_MIN = 0.375
+AR_MAX = 1
+AR_DELTA = 0.01
+AR_INIT = 0.8
+AR_D = 6
+
+# Dynamic k-nearest PSO
+K_NEIGHBORS = 5
+OMEGA = 1.0
+PSO_C = 0.5
+
+# Velocity clamp
+V_MAX = MAX_SPEED
+
+USE_MOTHERSHIP = False
