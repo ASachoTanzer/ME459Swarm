@@ -28,4 +28,10 @@ PSO_C = 0.5
 # Velocity clamp
 V_MAX = MAX_SPEED
 
+# Wall repulsion parameters
+# Distance (pixels) from wall where repulsion starts
+WALL_MARGIN = 20
+# Strength multiplier for wall repulsion
+WALL_STRENGTH = 2.0
+
 USE_MOTHERSHIP = False

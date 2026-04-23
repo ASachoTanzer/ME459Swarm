@@ -45,20 +45,53 @@ def v_repulsion(agent, neighbors, sim):
     v_rep = - sum_j aR * r_vec / r^(d+1)
     where r_vec = pos_j - pos_i, r = |r_vec|, d = config.AR_D
     """
-    ax = ay = 0.0
-    dpow = config.AR_D
-    aR = sim.aR
-    for n in neighbors:
-        rx = n.pos[0] - agent.pos[0]
-        ry = n.pos[1] - agent.pos[1]
-        r = math.hypot(rx, ry)
-        if r == 0:
-            continue
-        # contribution: - aR * (r_vec) / r^(d+1)
-        factor = -aR**dpow / (r ** (dpow + 1))
-        ax += factor * rx
-        ay += factor * ry
-    return (ax, ay)
+    rep_wall_x, rep_wall_y = wall_repulsion(agent, sim)
+    if rep_wall_x != 0 or rep_wall_y != 0:
+        return (rep_wall_x, rep_wall_y)
+    else:
+        ax = ay = 0.0
+        dpow = config.AR_D
+        aR = sim.aR
+        for n in neighbors:
+            rx = n.pos[0] - agent.pos[0]
+            ry = n.pos[1] - agent.pos[1]
+            r = math.hypot(rx, ry)
+            if r == 0:
+                continue
+            # contribution: - aR * (r_vec) / r^(d+1)
+            factor = -aR**dpow / (r ** (dpow + 1))
+            ax += factor * rx
+            ay += factor * ry
+        return (ax, ay)
+
+
+def wall_repulsion(agent, sim):
+    """Repel agent from simulation walls when within WALL_MARGIN.
+
+    Returns a vector pushing agent away from nearby walls.
+    """
+    margin = config.WALL_MARGIN
+    strength = config.WALL_STRENGTH
+    x, y = agent.pos
+    w, h = sim.window_size
+    wx = wy = 0.0
+    # left wall
+    if x < margin and x > 0:
+        r = max(x, 1e-4)
+        wx += strength * (1.0 / (r ** config.AR_D))
+    # right wall
+    if x > (w - margin):
+        r = max(w - x, 1e-4)
+        wx -= strength * (1.0 / (r ** config.AR_D))
+    # top wall
+    if y < margin and y > 0:
+        r = max(y, 1e-4)
+        wy += strength * (1.0 / (r ** config.AR_D))
+    # bottom wall
+    if y > (h - margin):
+        r = max(h - y, 1e-4)
+        wy -= strength * (1.0 / (r ** config.AR_D))
+    return (wx, wy)
 
 
 def vpso_component(agent, nbest_pos):
