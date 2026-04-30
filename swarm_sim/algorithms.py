@@ -105,6 +105,18 @@ def vpso_component(agent, nbest_pos):
     return (comp_x, comp_y)
 
 
+def v_mothership(agent, sim):
+    """Compute velocity component for moving towards mothership's estimated target."""
+    if agent.estimated_target is None:
+        return (0.0, 0.0)
+    
+    tx, ty = agent.estimated_target
+    ax, ay = agent.pos
+    dx = config.MOTHERSHIP_STRENGTH*agent.confidence*(tx - ax)
+    dy = config.MOTHERSHIP_STRENGTH*agent.confidence*(ty - ay)
+    return (dx, dy)
+
+
 def dynamic_k_pso(agent, sim):
     """Main update implementing Algorithm 2 for a single agent.
 
@@ -145,45 +157,6 @@ def dynamic_k_pso(agent, sim):
 
     # clamp to V_MAX
     return clamp((vx, vy), config.V_MAX)
-
-
-# maintain compatibility with existing simple algorithms
-def random_walk(agent, sim):
-    # small random jitter
-    ax = (random.random() - 0.5) * 0.6
-    ay = (random.random() - 0.5) * 0.6
-    vx, vy = agent.velocity
-    vx += ax
-    vy += ay
-    return clamp((vx, vy), sim.max_speed)
-
-
-def seek_target(agent, sim):
-    # prefer mothership-provided estimate if available
-    if getattr(agent, 'estimated_target', None) is not None:
-        tx, ty = agent.estimated_target
-    else:
-        tx, ty = sim.target_pos
-    # prefer mothership-provided estimate if available
-    if getattr(agent, 'estimated_target', None) is not None:
-        tx, ty = agent.estimated_target
-    else:
-        tx, ty = sim.target_pos
-    ax, ay = agent.pos
-    dx = tx - ax
-    dy = ty - ay
-    dist = math.hypot(dx, dy)
-    if dist >= agent.detection_radius:
-        ax = (random.random() - 0.5) * 0.6
-        ay = (random.random() - 0.5) * 0.6
-        vx, vy = agent.velocity
-        vx += ax
-        vy += ay
-        return clamp((vx, vy), sim.max_speed)
-    desired = (dx / dist * sim.max_speed, dy / dist * sim.max_speed) if dist>0 else (0,0)
-    vx, vy = agent.velocity
-    steer = (desired[0] - vx, desired[1] - vy)
-    return clamp((vx + steer[0]*0.05, vy + steer[1]*0.05), sim.max_speed)
 
 
 def distance_alias(a, b):

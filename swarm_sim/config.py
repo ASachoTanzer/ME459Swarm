@@ -8,7 +8,7 @@ NUM_AGENTS = 25
 MAX_SPEED = 2.5
 AGENT_RADIUS = 6
 MOTHERSHIP_POS = (50, 50)
-DETECTION_RADIUS = 30
+DETECTION_RADIUS = 10
 # If True, measurement noise will be applied to agent detection readings (not implemented yet)
 MEASUREMENT_NOISE = False
 
@@ -22,6 +22,7 @@ AR_D = 6
 
 # Dynamic k-nearest PSO
 K_NEIGHBORS = 5
+# K_NEIGHBORS = NUM_AGENTS - 1
 OMEGA = 1.0
 PSO_C = 0.5
 
@@ -34,4 +35,5 @@ WALL_MARGIN = 20
 # Strength multiplier for wall repulsion
 WALL_STRENGTH = 2.0
 
-USE_MOTHERSHIP = False
+USE_MOTHERSHIP = True
+MOTHERSHIP_STRENGTH = 5

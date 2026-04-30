@@ -12,10 +12,7 @@ class Agent:
         self.detection_radius = config.DETECTION_RADIUS
         self.measurement_noise = config.MEASUREMENT_NOISE
         self.estimated_target = None
-        # detection settings
-        self.detection_radius = config.DETECTION_RADIUS
-        self.measurement_noise = config.MEASUREMENT_NOISE
-        self.estimated_target = None
+        self.confidence = None
 
     def step(self, sim):
         # algorithm dispatcher
@@ -31,20 +28,12 @@ class Agent:
         self.pos[1] = max(0, min(h, self.pos[1]))
 
     def detect_and_report(self, sim):
-        # detect true target if within detection radius and report direction + distance
-        tx, ty = sim.target_pos
-        ax, ay = self.pos
-        dx = tx - ax
-        dy = ty - ay
-        dist = math.hypot(dx, dy)
-        if dist <= self.detection_radius:
-            if dist > 0:
-                direction = (dx / dist, dy / dist)
-            else:
-                direction = (0.0, 0.0)
-            # measurement noise flag exists; actual noise not implemented yet
-            sim.mothership.receive_detection(self, direction, dist)
+        # detect true target if within detection radius and report position
+        if algorithms.distance(self.pos, sim.target_pos) <= self.detection_radius:
+            tx, ty = sim.target_pos
+            sim.mothership.receive_detection(self, (tx, ty))
 
-    def receive_estimated_target(self, estimated_pos, sim=None):
+    def receive_transmission(self, estimated_pos, confidence, sim=None):
         # mothership-provided estimated target location
         self.estimated_target = estimated_pos
+        self.confidence = confidence

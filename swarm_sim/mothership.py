@@ -3,6 +3,8 @@ class Mothership:
         self.pos = pos
         self.subscribers = []
         self.detections = []  # list of (agent, direction, distance)
+        self.confidence = 0.0
+        self.x_estimate, self.y_estimate = None, None
         self.last_estimate = None
 
     def subscribe(self, agent):
@@ -13,52 +15,32 @@ class Mothership:
         if agent in self.subscribers:
             self.subscribers.remove(agent)
 
-    def broadcast(self, signal, sim=None):
-        # place signal in sim global list (for optionally delayed handling)
-        if sim is not None:
-            sim.global_signals.append(signal)
-        # Also notify directly
-        for s in list(self.subscribers):
-            try:
-                s.receive_signal(signal, sim)
-            except Exception:
-                pass
-
-    def receive_detection(self, agent, direction, distance):
+    def receive_detection(self, agent, position):
         # agents call this to report a direction (unit vector) and distance to target
-        self.detections.append((agent, direction, distance))
+        self.detections.append((agent, position))
 
     def integrate_detections(self, sim=None):
         # convert detections to estimated absolute positions and average them (weighted by confidence)
         if not self.detections:
-            return None
-        eps = 1e-6
-        weighted_x = 0.0
-        weighted_y = 0.0
-        total_w = 0.0
-        for agent, direction, distance in self.detections:
-            ax, ay = agent.pos
-            dx, dy = direction
-            est_x = ax + dx * distance
-            est_y = ay + dy * distance
-            # weight closer detections more (simple heuristic)
-            w = 1.0 / (distance + eps)
-            weighted_x += est_x * w
-            weighted_y += est_y * w
-            total_w += w
-        if total_w == 0:
-            return None
-        estimate = (weighted_x / total_w, weighted_y / total_w)
-        self.last_estimate = estimate
-        # clear detections for next timestep
-        self.detections.clear()
-        # broadcast estimated location to subscribers
-        self.broadcast_estimated_target(estimate, sim)
-        return estimate
+            self.confidence *= 0.9  # decay confidence if no detections
+        else:
+            self.confidence = 1
+            x_estimate, y_estimate = 0.0, 0.0
+            for i in self.detections:
+                x_estimate += i[1][0]
+                y_estimate += i[1][1]
+            x_estimate /= len(self.detections)
+            y_estimate /= len(self.detections)
+            self.x_estimate, self.y_estimate = x_estimate, y_estimate
 
-    def broadcast_estimated_target(self, estimated_pos, sim=None):
+        self.detections = []  # clear detections after integration
+        
+        self.broadcast_estimated_target()
+
+    def broadcast_estimated_target(self, sim=None):
+        print(f"Mothership broadcasting estimate: ({self.x_estimate:.2f}, {self.y_estimate:.2f}) with confidence {self.confidence:.2f}")
         for s in list(self.subscribers):
             try:
-                s.receive_estimated_target(estimated_pos, sim)
+                s.receive_transmission((self.x_estimate, self.y_estimate), self.confidence, sim)
             except Exception:
                 pass
