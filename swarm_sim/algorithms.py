@@ -46,23 +46,20 @@ def v_repulsion(agent, neighbors, sim):
     where r_vec = pos_j - pos_i, r = |r_vec|, d = config.AR_D
     """
     rep_wall_x, rep_wall_y = wall_repulsion(agent, sim)
-    if rep_wall_x != 0 or rep_wall_y != 0:
-        return (rep_wall_x, rep_wall_y)
-    else:
-        ax = ay = 0.0
-        dpow = config.AR_D
-        aR = sim.aR
-        for n in neighbors:
-            rx = n.pos[0] - agent.pos[0]
-            ry = n.pos[1] - agent.pos[1]
-            r = math.hypot(rx, ry)
-            if r == 0:
-                continue
-            # contribution: - aR * (r_vec) / r^(d+1)
-            factor = -aR**dpow / (r ** (dpow + 1))
-            ax += factor * rx
-            ay += factor * ry
-        return (ax, ay)
+    ax = ay = 0.0
+    dpow = config.AR_D
+    aR = sim.aR
+    for n in neighbors:
+        rx = n.pos[0] - agent.pos[0]
+        ry = n.pos[1] - agent.pos[1]
+        r = math.hypot(rx, ry)
+        if r == 0:
+            continue
+        # contribution: - aR * (r_vec) / r^(d+1)
+        factor = -aR**dpow / (r ** (dpow + 1))
+        ax += factor * rx
+        ay += factor * ry
+    return (ax + rep_wall_x, ay + rep_wall_y)
 
 
 def wall_repulsion(agent, sim):
