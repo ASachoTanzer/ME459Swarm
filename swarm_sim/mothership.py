@@ -22,7 +22,7 @@ class Mothership:
     def integrate_detections(self, sim=None):
         # convert detections to estimated absolute positions and average them (weighted by confidence)
         if not self.detections:
-            self.confidence *= 0.9  # decay confidence if no detections
+            self.confidence *= 0.995  # decay confidence if no detections
         else:
             self.confidence = 1
             x_estimate, y_estimate = 0.0, 0.0

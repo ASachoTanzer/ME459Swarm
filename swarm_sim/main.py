@@ -75,6 +75,8 @@ class Simulation:
             for a in self.agents:
                 a.step(self)
 
+            offset = (int(self.target_pos[0] - self.screen.get_width()/2), int(self.target_pos[1]- self.screen.get_height()/2))
+
             # optionally process queued global signals
             # while self.global_signals:
             #     sig = self.global_signals.pop(0)
@@ -85,13 +87,13 @@ class Simulation:
             self.screen.fill(config.BG_COLOR)
             if config.USE_MOTHERSHIP:
                 # mothership
-                pygame.draw.circle(self.screen, config.MOTHERSHIP_COLOR, (int(self.mothership.pos[0]), int(self.mothership.pos[1])), 10)
+                pygame.draw.circle(self.screen, config.MOTHERSHIP_COLOR, (int(self.mothership.pos[0] - offset[0]), int(self.mothership.pos[1] - offset[0])), 10)
             # target
-            pygame.draw.circle(self.screen, pygame.Color(255, 255, 255, a=0), (int(self.target_pos[0]), int(self.target_pos[1])), config.DETECTION_RADIUS)
-            pygame.draw.circle(self.screen, config.TARGET_COLOR, (int(self.target_pos[0]), int(self.target_pos[1])), 8)
+            pygame.draw.circle(self.screen, pygame.Color(255, 255, 255, a=0), (int(self.target_pos[0] - offset[0]), int(self.target_pos[1] - offset[1])), config.DETECTION_RADIUS)
+            pygame.draw.circle(self.screen, config.TARGET_COLOR, (int(self.target_pos[0] - offset[0]), int(self.target_pos[1] - offset[1])), 8)
             # agents
             for a in self.agents:
-                pygame.draw.circle(self.screen, config.AGENT_COLOR, (int(a.pos[0]), int(a.pos[1])), config.AGENT_RADIUS)
+                pygame.draw.circle(self.screen, config.AGENT_COLOR, (int(a.pos[0]- offset[0]), int(a.pos[1]- offset[1])), config.AGENT_RADIUS)
                 #pygame.draw.line(self.screen,[255,255,255],a.pos,self.mothership.pos)
                
 
@@ -108,6 +110,9 @@ class Simulation:
         for i, l in enumerate(lines):
             surf = font.render(l, True, (220,220,220))
             self.screen.blit(surf, (10, 10 + i*18))
+
+
+
 
 
 if __name__ == '__main__':
