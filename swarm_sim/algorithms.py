@@ -32,11 +32,11 @@ def adaptive_repulsion_update(sim, agent, neighbors):
 
     any_detect = detects(agent) or any(detects(n) for n in neighbors)
     if any_detect:
-        if sim.aR > config.AR_MIN:
-            sim.aR = max(config.AR_MIN, sim.aR - config.AR_DELTA)
+        if agent.aR > config.AR_MIN:
+            agent.aR = max(config.AR_MIN, agent.aR - config.AR_DELTA)
     else:
-        if sim.aR < config.AR_MAX:
-            sim.aR = min(config.AR_MAX, sim.aR + config.AR_DELTA)
+        if agent.aR < config.AR_MAX:
+            agent.aR = min(config.AR_MAX, agent.aR + config.AR_DELTA)
 
 
 def v_repulsion(agent, neighbors, sim):
@@ -48,7 +48,7 @@ def v_repulsion(agent, neighbors, sim):
     rep_wall_x, rep_wall_y = wall_repulsion(agent, sim)
     ax = ay = 0.0
     dpow = config.AR_D
-    aR = sim.aR
+    aR = agent.aR
     for n in neighbors:
         rx = n.pos[0] - agent.pos[0]
         ry = n.pos[1] - agent.pos[1]

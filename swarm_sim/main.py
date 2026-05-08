@@ -19,7 +19,6 @@ class Simulation:
         self.target_pos = (self.window_size[0]//2, self.window_size[1]//2)
         self.max_speed = config.MAX_SPEED
         # adaptive repulsion coefficient (updated by algorithms)
-        self.aR = config.AR_INIT
 
     def setup(self, num_agents=20):
         w, h = self.window_size
