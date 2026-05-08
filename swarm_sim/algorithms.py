@@ -45,7 +45,7 @@ def v_repulsion(agent, neighbors, sim):
     v_rep = - sum_j aR * r_vec / r^(d+1)
     where r_vec = pos_j - pos_i, r = |r_vec|, d = config.AR_D
     """
-    rep_wall_x, rep_wall_y = 0,0
+    rep_wall_x, rep_wall_y = wall_repulsion(agent,sim)
     ax = ay = 0.0
     dpow = config.AR_D
     aR = agent.aR
@@ -157,7 +157,3 @@ def dynamic_k_pso(agent, sim):
 
     # clamp to V_MAX
     return clamp((vx, vy), config.V_MAX)
-
-
-def distance_alias(a, b):
-    return distance(a, b)
