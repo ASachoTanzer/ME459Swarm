@@ -9,7 +9,8 @@ from swarm_sim.evaluation import Evaluator
 
 
 class Simulation:
-    def __init__(self):
+    def __init__(self, id):
+        self.id = id
         pygame.init()
         self.window_size = config.WINDOW_SIZE
         self.screen = pygame.display.set_mode(self.window_size)
@@ -144,6 +145,9 @@ class Simulation:
             self._draw_info()
             pygame.display.flip()
 
+            if t >= config.SIM_TIME:
+                running = False
+
         self._print_and_save_metrics()
         pygame.quit()
 
@@ -167,7 +171,7 @@ class Simulation:
     def _print_and_save_metrics(self):
         summary = self.evaluator.summary()
         mode = 'mothership' if config.USE_MOTHERSHIP else 'decentralized'
-        filename = f'swarm_metrics_{mode}.csv'
+        filename = f'./results/swarm_metrics_{mode}_{self.id}.csv'
 
         print('\nKwa metric summary')
         print(f'Mode: {mode}')
@@ -184,6 +188,14 @@ class Simulation:
 
 
 if __name__ == '__main__':
-    sim = Simulation()
-    sim.setup(num_agents=config.NUM_AGENTS)
-    sim.run()
+    config.USE_MOTHERSHIP = True
+    for n in range(5):
+        sim = Simulation(n)
+        sim.setup(num_agents=config.NUM_AGENTS)
+        sim.run()
+
+    config.USE_MOTHERSHIP = False
+    for n in range(5):
+        sim = Simulation(n)
+        sim.setup(num_agents=config.NUM_AGENTS)
+        sim.run()
