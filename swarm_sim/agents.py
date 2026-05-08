@@ -13,6 +13,7 @@ class Agent:
         self.measurement_noise = config.MEASUREMENT_NOISE
         self.estimated_target = None
         self.confidence = None
+        self.aR = config.AR_INIT
 
     def step(self, sim):
         # algorithm dispatcher
