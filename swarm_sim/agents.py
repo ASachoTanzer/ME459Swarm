@@ -31,8 +31,9 @@ class Agent:
     def detect_and_report(self, sim):
         # detect true target if within detection radius and report position
         if algorithms.distance(self.pos, sim.target_pos) <= self.detection_radius:
-            tx, ty = sim.target_pos
-            sim.mothership.receive_detection(self, (tx, ty))
+            # tx, ty = sim.target_pos
+            # sim.mothership.receive_detection(self, (tx, ty))
+            sim.mothership.receive_detection(self, self.pos)
 
     def receive_transmission(self, estimated_pos, confidence, sim=None):
         # mothership-provided estimated target location
