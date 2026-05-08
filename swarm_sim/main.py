@@ -107,11 +107,12 @@ class Simulation:
         pygame.quit()
 
     def _draw_info(self):
-        font = pygame.font.SysFont('Arial', 16)
+        pass
+        """font = pygame.font.SysFont('Arial', 16)
         lines = [f'Agents: {len(self.agents)}', 'Keys: 1=seek 2=flock 3=scatter']
         for i, l in enumerate(lines):
             surf = font.render(l, True, (220,220,220))
-            self.screen.blit(surf, (10, 10 + i*18))
+            self.screen.blit(surf, (10, 10 + i*18))"""
 
 
 
