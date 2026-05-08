@@ -103,11 +103,6 @@ class Simulation:
             else:
                 offset = (0,0)
 
-            offset = (
-                int(self.target_pos[0] - self.screen.get_width() / 2),
-                int(self.target_pos[1] - self.screen.get_height() / 2),
-            )
-
             # Draw
             self.screen.fill(config.BG_COLOR)
 

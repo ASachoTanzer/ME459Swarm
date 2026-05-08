@@ -35,7 +35,7 @@ WALL_MARGIN = 20
 # Strength multiplier for wall repulsion
 WALL_STRENGTH = 2.0
 
-USE_MOTHERSHIP = True
-MOTHERSHIP_STRENGTH = 1e-3
+USE_MOTHERSHIP = False
+MOTHERSHIP_STRENGTH = 1e-4
 
 CAMERA_FOLLOW = False
