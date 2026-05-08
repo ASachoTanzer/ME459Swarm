@@ -45,8 +45,8 @@ def v_repulsion(agent, neighbors, sim):
     v_rep = - sum_j aR * r_vec / r^(d+1)
     where r_vec = pos_j - pos_i, r = |r_vec|, d = config.AR_D
     """
-    rep_wall_x, rep_wall_y = 0,0
-    ax = ay = 0.0
+    rep_wall_x, rep_wall_y = wall_repulsion_2(agent, sim)
+    vx = vy = 0.0
     dpow = config.AR_D
     aR = agent.aR
     for n in neighbors:
@@ -57,10 +57,26 @@ def v_repulsion(agent, neighbors, sim):
             continue
         # contribution: - aR * (r_vec) / r^(d+1)
         factor = -aR**dpow / (r ** (dpow + 1))
-        ax += factor * rx
-        ay += factor * ry
-    return (ax + rep_wall_x, ay + rep_wall_y)
+        vx += factor * rx
+        vy += factor * ry
+    return (vx + rep_wall_x, vy + rep_wall_y)
 
+
+def wall_repulsion_2(agent, sim):
+    dpow = config.AR_D
+    aR = agent.aR
+    w, h = sim.window_size
+
+    rx1 = agent.pos[0]
+    rx2 = w - agent.pos[0]
+    ry1 = agent.pos[1]
+    ry2 = h - agent.pos[1]
+    
+    epsilon = 1e-4
+    # contribution: - aR * (r_vec) / r^(d+1)
+    vx = aR**dpow / (rx1 ** dpow + epsilon) - aR**dpow / (rx2 ** dpow + epsilon)
+    vy = aR**dpow / (ry1 ** dpow + epsilon) - aR**dpow / (ry2 ** dpow + epsilon)
+    return (vx, vy)
 
 def wall_repulsion(agent, sim):
     """Repel agent from simulation walls when within WALL_MARGIN.
@@ -145,7 +161,7 @@ def dynamic_k_pso(agent, sim):
     # vpso
     vpso = vpso_component(agent, nbest)
 
-    # adaptive repulsion update using Algorithm 1 (updates sim.aR)
+    # adaptive repulsion update using Algorithm 1 (updates agent.aR)
     adaptive_repulsion_update(sim, agent, neighbors)
 
     # vrep

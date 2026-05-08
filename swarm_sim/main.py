@@ -74,7 +74,10 @@ class Simulation:
             for a in self.agents:
                 a.step(self)
 
-            offset = (int(self.target_pos[0] - self.screen.get_width()/2), int(self.target_pos[1]- self.screen.get_height()/2))
+            if config.CAMERA_FOLLOW:
+                offset = (int(self.target_pos[0] - self.screen.get_width()/2), int(self.target_pos[1]- self.screen.get_height()/2))
+            else:
+                offset = (0,0)
 
             # optionally process queued global signals
             # while self.global_signals:
