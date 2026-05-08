@@ -19,9 +19,6 @@ class Agent:
         # algorithm dispatcher
         # fn = getattr(algorithms, self.algorithm, algorithms.random_walk)
         new_vel = algorithms.dynamic_k_pso(self, sim)
-        if config.USE_MOTHERSHIP:
-            mothership_vel = algorithms.v_mothership(self, sim)
-            new_vel = (new_vel[0] + mothership_vel[0], new_vel[1] + mothership_vel[1])
         # apply velocity and clamp
         self.velocity = new_vel
         self.pos[0] += self.velocity[0]
