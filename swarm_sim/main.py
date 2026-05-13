@@ -17,6 +17,7 @@ class Simulation:
         pygame.display.set_caption('Swarm Sim — moving target + mothership')
         self.clock = pygame.time.Clock()
         self.agents = []
+        self.dt
 
         if config.USE_MOTHERSHIP:
             self.mothership = Mothership(config.MOTHERSHIP_POS)

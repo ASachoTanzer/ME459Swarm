@@ -177,4 +177,4 @@ def dynamic_k_pso(agent, sim):
         vy += mothership_vel[1]
 
     # clamp to V_MAX
-    return clamp((vx, vy), config.V_MAX)
+    return clamp((vx, vy), config.MAX_SPEED )
