@@ -13,7 +13,7 @@ from swarm_sim.pygame import Simulation as PygameSimulation
 
 if __name__ == '__main__':
     config.USE_MOTHERSHIP = True
-    for n in range(5):
+    for n in range(50):
         if config.USE_PYGAME:
             sim = PygameSimulation(n)
         else:
@@ -22,7 +22,7 @@ if __name__ == '__main__':
         sim.run()
 
     config.USE_MOTHERSHIP = False
-    for n in range(5):
+    for n in range(50):
         if config.USE_PYGAME:
             sim = PygameSimulation(n)
         else:

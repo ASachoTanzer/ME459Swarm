@@ -38,7 +38,7 @@ class Mothership:
         self.broadcast_estimated_target()
 
     def broadcast_estimated_target(self, sim=None):
-        print(f"Mothership broadcasting estimate: ({self.x_estimate:.2f}, {self.y_estimate:.2f}) with confidence {self.confidence:.2f}")
+        # print(f"Mothership broadcasting estimate: ({self.x_estimate:.2f}, {self.y_estimate:.2f}) with confidence {self.confidence:.2f}")
         for s in list(self.subscribers):
             try:
                 s.receive_transmission((self.x_estimate, self.y_estimate), self.confidence, sim)
