@@ -1,13 +1,12 @@
 import math
 from swarm_sim import algorithms
 from swarm_sim import config
-from swarm_sim import config
 
 class Agent:
     def __init__(self, pos, vel):
         self.pos = list(pos)
         self.velocity = list(vel)
-        self.radius = 6
+        self.radius = config.AGENT_RADIUS
         # detection settings
         self.detection_radius = config.DETECTION_RADIUS
         self.measurement_noise = config.MEASUREMENT_NOISE
@@ -19,10 +18,12 @@ class Agent:
         # algorithm dispatcher
         # fn = getattr(algorithms, self.algorithm, algorithms.random_walk)
         new_vel = algorithms.dynamic_k_pso(self, sim)
-        # apply velocity and clamp
+
+        # apply velocity and move position forward by a time step
         self.velocity = new_vel
         self.pos[0] += self.velocity[0]
         self.pos[1] += self.velocity[1]
+
         # keep inside window
         w, h = sim.window_size
         self.pos[0] = max(0, min(w, self.pos[0]))
