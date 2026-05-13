@@ -92,33 +92,46 @@ if show_plots:
 # plt.close()
 
 
-fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(9, 10), sharex=True)
+# Plot averaged metrics in separate figure windows
+fig_cvfm, ax_cvfm = plt.subplots(figsize=(6, 4))
+fig_hbc, ax_hbc = plt.subplots(figsize=(6, 4))
+fig_on, ax_on = plt.subplots(figsize=(6, 4))
+
 for results, kind in [(decentralized_results, 'decentralized'), (mothership_results, 'mothership')]:
     avg_data = aggregate_time_series(results)
-    axes[0].plot(avg_data.index, avg_data['cvfm'], label=kind)    
-    axes[1].plot(avg_data.index, avg_data['mean_hbc'], label=kind)    
-    axes[2].plot(avg_data.index, avg_data['on_target'], label=kind)
+    # if not avg_data.empty:
+    ax_cvfm.plot(avg_data.index, avg_data['cvfm'], label=kind)
+    ax_hbc.plot(avg_data.index, avg_data['mean_hbc'], label=kind)
+    ax_on.plot(avg_data.index, avg_data['on_target'], label=kind)
 
-axes[0].set_xlabel('time')
-axes[0].set_ylabel('cvfm')
-axes[0].set_title('cvfm')
-axes[0].legend()
-axes[1].set_xlabel('time')
-axes[1].set_ylabel('mean_hbc')
-axes[1].set_title('mean_hbc')
-axes[1].legend()
-axes[2].set_xlabel('time')
-axes[2].set_ylabel('on_target')
-axes[2].set_title('on_target')
-axes[2].legend()
-    
+ax_cvfm.set_xlabel('time')
+ax_cvfm.set_ylabel('cvfm')
+ax_cvfm.set_title('cvfm')
+ax_cvfm.grid()
+ax_cvfm.legend()
+
+ax_hbc.set_xlabel('time')
+ax_hbc.set_ylabel('mean_hbc')
+ax_hbc.set_title('mean_hbc')
+ax_hbc.grid()
+ax_hbc.legend()
+
+ax_on.set_xlabel('time')
+ax_on.set_ylabel('on_target')
+ax_on.set_title('on_target')
+ax_on.grid()
+ax_on.legend()
+
 plt.tight_layout()
 if save_plots:
-    out = f"{plots_dir}average_metrics.png"
-    plt.savefig(out)
+    fig_cvfm.savefig(f"{plots_dir}average_cvfm.png")
+    fig_hbc.savefig(f"{plots_dir}average_mean_hbc.png")
+    fig_on.savefig(f"{plots_dir}average_on_target.png")
 if show_plots:
+    # fig_cvfm.show()
+    # fig_hbc.show()
+    # fig_on.show()
     plt.show()
-# plt.close()
 
 
 # Print summary statistics
