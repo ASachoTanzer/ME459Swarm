@@ -41,3 +41,5 @@ MOTHERSHIP_STRENGTH = 1e-4
 CAMERA_FOLLOW = False
 
 SIM_TIME = 120  # seconds
+
+USE_PYGAME = False
