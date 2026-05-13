@@ -27,6 +27,19 @@ def aggregate_time_series(dfs):
     return result
 
 
+def clean_data(dfs):
+    # resample dfs to consistent timesteps
+    dfs_aligned = []
+    for df in dfs:
+        df["time"] = pd.to_datetime(df["time"], unit="s")
+        df = df.resample(".1s", on="time").mean()
+        df.reset_index(inplace=True)
+        df["time"] = df["time"].astype("int64")
+        dfs_aligned.append(df)
+    return dfs_aligned
+    
+
+
 save_plots = False
 show_plots = True
 
@@ -47,6 +60,9 @@ for path in csv_paths:
         mothership_results.append(df)
     else:
         print(f"Warning: could not classify {path} as decentralized or mothership based on filename")
+
+decentralized_results = clean_data(decentralized_results)
+mothership_results = clean_data(mothership_results)
 
 
 # Per-file plotting
@@ -69,11 +85,11 @@ for idx, (results, kind) in enumerate([(decentralized_results, 'decentralized'),
     
 plt.tight_layout()
 if save_plots:
-    out = plots_dir / f'individual_metrics.png'
+    out = f"{plots_dir}individual_metrics.png"
     plt.savefig(out)
 if show_plots:
     plt.show()
-plt.close()
+# plt.close()
 
 
 fig, axes = plt.subplots(nrows=1, ncols=3, figsize=(9, 10), sharex=True)
@@ -98,11 +114,11 @@ axes[2].legend()
     
 plt.tight_layout()
 if save_plots:
-    out = plots_dir / f'average_metrics.png'
+    out = f"{plots_dir}average_metrics.png"
     plt.savefig(out)
 if show_plots:
     plt.show()
-plt.close()
+# plt.close()
 
 
 # Print summary statistics
