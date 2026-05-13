@@ -1,19 +1,17 @@
 import random
 import math
+import time
 
 from swarm_sim import config
 from swarm_sim.agents import Agent
 from swarm_sim.mothership import Mothership
 from swarm_sim.evaluation import Evaluator
 
+
 class Simulation:
     def __init__(self, id):
         self.id = id
-        pygame.init()
         self.window_size = config.WINDOW_SIZE
-        self.screen = pygame.display.set_mode(self.window_size)
-        pygame.display.set_caption('Swarm Sim — moving target + mothership')
-        self.clock = pygame.time.Clock()
         self.agents = []
 
         if config.USE_MOTHERSHIP:
@@ -35,7 +33,9 @@ class Simulation:
             "time_on_target_percent_so_far": 0.0,
         }
 
-    def setup(self, num_agents=20):
+    def setup(self, num_agents=None):
+        if num_agents is None:
+            num_agents = getattr(config, 'NUM_AGENTS', 20)
         w, h = self.window_size
         for _ in range(num_agents):
             x = random.uniform(80, w - 80)
@@ -49,26 +49,18 @@ class Simulation:
             if config.USE_MOTHERSHIP:
                 self.mothership.subscribe(a)
 
-    def run(self):
-        running = True
+    def run(self, dt=None, progress_every: float = None):
+        """Run the simulation headless.
+
+        - `dt`: simulated timestep (seconds). If None, uses `config.DT` or 0.017s.
+        - `progress_every`: if set, prints progress every `progress_every` simulated seconds.
+        """
         t = 0.0
+        dt = 0.017
+        last_print = 0.0
 
-        while running:
-            dt = self.clock.tick(config.FPS) / 1000.0
-            dt = 0.017
+        while t < config.SIM_TIME:
             t += dt
-
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.KEYDOWN:
-                    pass
-                    # if event.key == pygame.K_1:
-                    #     self.mothership.broadcast('go_seek', self)
-                    # elif event.key == pygame.K_2:
-                    #     self.mothership.broadcast('go_flock', self)
-                    # elif event.key == pygame.K_3:
-                    #     self.mothership.broadcast('scatter', self)
 
             # Update moving target on a circular/elliptical path
             cx, cy = self.window_size[0] // 2, self.window_size[1] // 2
@@ -98,74 +90,13 @@ class Simulation:
 
             # Record Kwa metrics once per simulation frame, after target and agent updates.
             self.latest_metrics = self.evaluator.sample(self, t)
-            if config.CAMERA_FOLLOW:
-                offset = (int(self.target_pos[0] - self.screen.get_width()/2), int(self.target_pos[1]- self.screen.get_height()/2))
-            else:
-                offset = (0,0)
 
-            # Draw
-            self.screen.fill(config.BG_COLOR)
+            if progress_every and (t - last_print) >= progress_every:
+                print(f"Sim {self.id}: t={t:.2f}/{config.SIM_TIME}")
+                last_print = t
 
-            if config.USE_MOTHERSHIP:
-                pygame.draw.circle(
-                    self.screen,
-                    config.MOTHERSHIP_COLOR,
-                    (
-                        int(self.mothership.pos[0] - offset[0]),
-                        int(self.mothership.pos[1] - offset[1]),
-                    ),
-                    10,
-                )
-
-            # Target detection radius and target center
-            pygame.draw.circle(
-                self.screen,
-                pygame.Color(255, 255, 255, a=0),
-                (int(self.target_pos[0] - offset[0]), int(self.target_pos[1] - offset[1])),
-                config.DETECTION_RADIUS,
-            )
-            pygame.draw.circle(
-                self.screen,
-                config.TARGET_COLOR,
-                (int(self.target_pos[0] - offset[0]), int(self.target_pos[1] - offset[1])),
-                8,
-            )
-
-            # Agents
-            for a in self.agents:
-                pygame.draw.circle(
-                    self.screen,
-                    config.AGENT_COLOR,
-                    (int(a.pos[0] - offset[0]), int(a.pos[1] - offset[1])),
-                    config.AGENT_RADIUS,
-                )
-                # pygame.draw.line(self.screen, [255, 255, 255], a.pos, self.mothership.pos)
-
-            self._draw_info()
-            pygame.display.flip()
-
-            if t >= config.SIM_TIME:
-                running = False
-
+        # Done: save metrics
         self._print_and_save_metrics()
-        pygame.quit()
-
-    def _draw_info(self):
-        font = pygame.font.SysFont('Arial', 16)
-        summary = self.evaluator.summary()
-        mode = 'Mothership' if config.USE_MOTHERSHIP else 'Decentralized'
-
-        lines = [
-            f'Mode: {mode}',
-            f'Agents: {len(self.agents)}',
-            f'CVFM now/run: {self.latest_metrics["cvfm"]:.3f} / {summary["cvfm"]:.3f}',
-            f'HBC now/run: {self.latest_metrics["hbc"]:.3f} / {summary["mean_hbc"]:.3f}',
-            f'Time on target: {summary["time_on_target_percent"]:.1f}%',
-        ]
-
-        for i, line in enumerate(lines):
-            surf = font.render(line, True, (220, 220, 220))
-            self.screen.blit(surf, (10, 10 + i * 18))
 
     def _print_and_save_metrics(self):
         summary = self.evaluator.summary()
@@ -174,7 +105,7 @@ class Simulation:
 
         print('\nKwa metric summary')
         print(f'Mode: {mode}')
-        print(f'Samples: {int(summary["samples"])}')
+        print(f'Samples: {int(summary["samples"]) }')
         print(f'Cumulative velocity fluctuation magnitude: {summary["cvfm"]:.6f}')
         print(f'Mean heading-bearing correlation: {summary["mean_hbc"]:.6f}')
         print(f'Time on target: {summary["time_on_target_percent"]:.2f}%')
