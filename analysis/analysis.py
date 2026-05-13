@@ -34,7 +34,7 @@ def clean_data(dfs):
         df["time"] = pd.to_datetime(df["time"], unit="s")
         df = df.resample(".1s", on="time").mean()
         df.reset_index(inplace=True)
-        df["time"] = df["time"].astype("int64")
+        df["time"] = df["time"].astype("int64")/1e9
         dfs_aligned.append(df)
     return dfs_aligned
     
