@@ -123,9 +123,10 @@ def vpso_component(agent, nbest_pos):
 
 def v_mothership(agent, sim):
     """Compute velocity component for moving towards mothership's estimated target."""
-    if agent.estimated_target is None:
+    if agent.estimated_target[0] is None or agent.estimated_target[1] is None:
         return (0.0, 0.0)
     
+
     tx, ty = agent.estimated_target
     ax, ay = agent.pos
     dx = config.MOTHERSHIP_STRENGTH*agent.confidence*(tx - ax)
